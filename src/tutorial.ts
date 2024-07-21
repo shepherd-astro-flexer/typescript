@@ -255,25 +255,174 @@
 // let bird = birdObject as Bird;
 // console.log(bird);
 
-const runSomeCode = () => {
-  const random = Math.random();
+// const runSomeCode = () => {
+//   const random = Math.random();
 
-  if (random < 0.5) {
-    // coming from the error class
-    throw new Error("This is coming from the error class");
-  } else {
-    throw "error...";
-  }
+//   if (random < 0.5) {
+//     // coming from the error class
+//     throw new Error("This is coming from the error class");
+//   } else {
+//     throw "error...";
+//   }
+// };
+
+// try {
+//   runSomeCode();
+// } catch (error) {
+//   // error is of type unknown
+//   if (error instanceof Error) {
+//     // if this is true, typescript know for sure that we have access to the message
+//     console.log(error.message);
+//   } else {
+//     console.log(error);
+//   }
+// }
+
+// type ValueType = String | Number | Boolean;
+
+// let value: ValueType;
+// const random = Math.random();
+// value = random < 0.33 ? "Hello" : random < 0.66 ? 123.456 : true;
+
+// const checkValue = (value: ValueType) => {
+//   if (typeof value === "string") {
+//     console.log(value.toLowerCase());
+//     return;
+//   } else if (typeof value === "number") {
+//     console.log(value.toFixed(2));
+//     return;
+//   } else {
+//     console.log(`boolean: ${value}`);
+//     return;
+//   }
+// };
+
+// checkValue(value);
+
+// type Dog = { type: "dog"; name: string; bark: (sound: string) => void };
+// type Cat = { type: "cat"; name: string; meow: (sound: string) => void };
+// type Animal = Dog | Cat;
+
+// const makeSound = (animal: Animal): void => {
+//   if (animal.type === "dog") {
+//     animal.bark("bark");
+//   } else {
+//     animal.meow("meow");
+//   }
+// };
+
+// const pet: Animal = {
+//   type: "cat",
+//   name: "pishok",
+//   meow: (sound) => console.log(`${sound} maderf***er`),
+// };
+
+// makeSound(pet);
+// type Str = string | null | undefined;
+
+// const printLength = (str: Str) => {
+//   if (str) {
+//     console.log(str.length);
+//   } else {
+//     console.log("No string privided.");
+//   }
+// };
+
+// printLength("qwqw");
+// const genericArrowFunction<T>(value: T) T => {
+//     return value
+// }
+// ! Generic
+// setting up generic functions
+
+// function genericFunction<T>(value: T): T {
+//   return value;
+// }
+
+// const genericString = genericFunction<string>("name");
+// const genericNumber = genericFunction<number>(2);
+// console.log(genericString);
+// console.log(genericNumber);
+
+// interface GenericInterface<T> {
+//   value: T;
+//   testFunc: () => T;
+// }
+
+// const genericSetup1: GenericInterface<string> = {
+//   value: "test",
+//   testFunc() {
+//     return this.value;
+//   },
+// };
+
+// const genericSetup2: GenericInterface<number> = {
+//   value: 4,
+//   testFunc() {
+//     return this.value;
+//   },
+// };
+
+// console.log(genericSetup1);
+// console.log(genericSetup2);
+
+// function createArray<T>(length: number, value: T): Array<T> {
+//   return Array.from({ length }, () => value);
+// }
+
+// const createStringArray = createArray<string>(3, "hello");
+// const createNumberArray = createArray<number>(4, 100);
+
+// console.log(createStringArray);
+// console.log(createNumberArray);
+
+// function pair<T, U>(param1: T, param2: U): [T, U] {
+//   return [param1, param2];
+// }
+
+// const firstPair = pair<string, number>("astro", 2);
+// const secondPair = pair<number, string>(4, "flexer");
+
+// console.log(firstPair);
+// console.log(secondPair);
+
+const url = "https://www.course-api.com/react-tours-project";
+
+// type
+// this function is going to return a promise(which is a generic), which is an array of type T(what value we pass in as T )
+
+type Obj = {
+  name: string;
+  id: string;
+  info: string;
+  price: string;
+  image: string;
 };
 
-try {
-  runSomeCode();
-} catch (error) {
-  // error is of type unknown
-  if (error instanceof Error) {
-    // if this is true, typescript know for sure that we have access to the message
-    console.log(error.message);
-  } else {
-    console.log(error);
+async function fetchData(url: string): Promise<Obj[]> {
+  try {
+    const response = await fetch(url);
+
+    // we need to set this up because fetch API don't treat status code 400+ as an error
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: Obj[] = await response.json();
+
+    return data;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "There was a problem";
+    console.log(errorMessage);
+
+    return [];
   }
 }
+
+const tours = await fetchData(url);
+
+console.log(tours);
+tours.map((tour) => {
+  console.log(tour);
+});

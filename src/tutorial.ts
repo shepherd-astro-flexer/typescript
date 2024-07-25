@@ -385,44 +385,63 @@
 
 // console.log(firstPair);
 // console.log(secondPair);
+// ! fetching data
+import { z } from "zod";
 
 const url = "https://www.course-api.com/react-tours-project";
 
-// type
-// this function is going to return a promise(which is a generic), which is an array of type T(what value we pass in as T )
+// type Tour = {
+//   id: string;
+//   image: string;
+//   info: string;
+//   name: string;
+//   price: string;
+//   something: string;
+// };
 
-type Obj = {
-  name: string;
-  id: string;
-  info: string;
-  price: string;
-  image: string;
-};
+// create schema
+const tourSchema = z.object({
+  id: z.string(),
+  image: z.string(),
+  info: z.string(),
+  name: z.string(),
+  price: z.string(),
+});
 
-async function fetchData(url: string): Promise<Obj[]> {
+type Tour = z.infer<typeof tourSchema>;
+
+async function fetchData(url: string): Promise<Tour[]> {
   try {
     const response = await fetch(url);
-
-    // we need to set this up because fetch API don't treat status code 400+ as an error
+    // we need to do additional checks because fetch url doesn't treat status codes 400+ as error
     if (!response.ok) {
+      // we want to check if the response is really ok. If it's not, then we throw a new error
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    // here, we are going to access the response.json and invoke it, and since it is a asynchronous, we are going to use await in front of it
+    const rawData: Tour[] = await response.json();
 
-    const data: Obj[] = await response.json();
+    const result = tourSchema.array().safeParse(rawData);
 
-    return data;
+    if (!result.success) {
+      throw new Error(`Invalid data: ${result.error}`);
+    }
+
+    return result.data;
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "There was a problem";
-    console.log(errorMessage);
+    const errorMsg =
+      error instanceof Error ? error.message : "Something went wrong...";
+    console.log(errorMsg);
 
+    // we still need to return something from the catch block in this case
     return [];
   }
 }
 
 const tours = await fetchData(url);
 
-console.log(tours);
-tours.map((tour) => {
-  console.log(tour);
-});
+// tours.map((tour) => {
+//   // here we are accesing a property that doesn't exist in the tour object, but since it is a property that exist on the type, and in this case, typescript doesn't notice it until the buildtime
+//   // so how do we check that all the properties that we are accessing in the tour object really exist even if we have that property on the type?
+//   console.log(tour.something);
+// });
